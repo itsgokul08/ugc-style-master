@@ -199,6 +199,7 @@ export default function App() {
               onFiles={(files) => handleFiles(files, "reference")}
               onPickFromGallery={() => openGalleryPicker("reference")}
               onRemove={() => setReference(null)}
+              showPasteButton
             >
               <Mountain size={28} />
             </UploadDropZone>

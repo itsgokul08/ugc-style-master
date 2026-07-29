@@ -1,5 +1,5 @@
 import { useRef, useState, type ReactNode } from "react";
-import { X, Images } from "lucide-react";
+import { X, Images, Clipboard } from "lucide-react";
 import type { ReferenceAsset } from "../lib/types";
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
   onRemove: () => void;
   children: ReactNode; // icon shown in the empty state
   compact?: boolean;
+  showPasteButton?: boolean;
 };
 
 export function UploadDropZone({
@@ -24,14 +25,37 @@ export function UploadDropZone({
   onRemove,
   children,
   compact = false,
+  showPasteButton = false,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [pasteHint, setPasteHint] = useState("");
 
   function handleDrop(e: React.DragEvent) {
     e.preventDefault();
     setIsDragOver(false);
     if (e.dataTransfer.files?.length) onFiles(e.dataTransfer.files);
+  }
+
+  async function handlePasteClick() {
+    setPasteHint("");
+    try {
+      const items = await navigator.clipboard.read();
+      for (const item of items) {
+        const imageType = item.types.find((t) => t.startsWith("image/"));
+        if (imageType) {
+          const blob = await item.getType(imageType);
+          const file = new File([blob], "pasted-image.png", { type: imageType });
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          onFiles(dt.files);
+          return;
+        }
+      }
+      setPasteHint("No image found on your clipboard — copy an image first.");
+    } catch {
+      setPasteHint("Couldn't read the clipboard — copy an image, then try again.");
+    }
   }
 
   return (
@@ -86,7 +110,7 @@ export function UploadDropZone({
         >
           <div className="mb-2 text-gray-500">{children}</div>
           <p className="mb-1 text-xs text-gray-500">{description}</p>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <button
               onClick={() => inputRef.current?.click()}
               disabled={isUploading}
@@ -102,8 +126,22 @@ export function UploadDropZone({
               <Images size={14} />
               From gallery
             </button>
+            {showPasteButton && (
+              <>
+                <span className="text-xs text-gray-600">or</span>
+                <button
+                  onClick={handlePasteClick}
+                  disabled={isUploading}
+                  className="flex items-center gap-1 rounded-lg border border-white/15 px-3 py-1.5 text-xs text-gray-200 hover:bg-white/10 disabled:opacity-50"
+                >
+                  <Clipboard size={14} />
+                  Paste
+                </button>
+              </>
+            )}
           </div>
           <p className="mt-2 text-xs text-gray-600">Drag &amp; drop or paste an image</p>
+          {pasteHint && <p className="mt-1 text-xs text-amber-400">{pasteHint}</p>}
         </div>
       )}
     </div>

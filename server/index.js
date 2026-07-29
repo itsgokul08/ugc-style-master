@@ -37,6 +37,38 @@ function pushLabeledImage(content, label, dataUrl) {
   content.push(block);
 }
 
+// Raw slider values ("curvy", "large") on their own are too weak a signal for the
+// model to visibly commit to over a real reference photo. Expanding them into a
+// vivid physical description gives it something concrete to actually render.
+const BODY_WEIGHT_DESCRIPTIONS = {
+  slim: "slim build — slender frame, narrow waist and hips, minimal body fat, long lean limbs",
+  average: "average build — natural, everyday proportions, neither slim nor heavy",
+  athletic: "athletic build — toned and fit, visible muscle definition in arms/legs/core, broader shoulders relative to waist",
+  curvy: "curvy build — noticeably fuller hips and thighs, a pronounced waist-to-hip curve, soft rounded silhouette",
+};
+
+const BOOBS_SIZE_DESCRIPTIONS = {
+  flat: "flat chest — minimal bust, straight torso line",
+  small: "small chest — modest, petite bust",
+  medium: "medium chest — average, proportionate bust",
+  large: "large chest — noticeably full, prominent bust",
+};
+
+function bodyLines(ageRange, bodyWeight, boobsSize) {
+  return [
+    `Depict this person's age as: ${ageRange}`,
+    `Depict this person's body as having a ${BODY_WEIGHT_DESCRIPTIONS[bodyWeight] || bodyWeight} — this description takes priority over the reference photo if it differs, and the difference should be clearly visible, not subtle`,
+    `Depict this person's chest as having a ${BOOBS_SIZE_DESCRIPTIONS[boobsSize] || boobsSize} — this description takes priority over the reference photo if it differs, and the difference should be clearly visible, not subtle`,
+  ];
+}
+
+function sceneLine(sceneDescription, locationImage, fallback) {
+  const hasText = sceneDescription && sceneDescription.trim().length > 0;
+  if (hasText) return `Scene description: ${sceneDescription}`;
+  if (locationImage) return "Scene description: none provided — build the scene entirely from the location reference image above.";
+  return `Scene description: ${fallback}`;
+}
+
 async function generatePrompt(systemPrompt, content) {
   const response = await anthropic.messages.create({
     model: MODEL,
@@ -77,11 +109,9 @@ app.post("/api/generate/ugc", async (req, res) => {
     );
 
     const lines = [
-      `Scene description: ${sceneDescription || "candid everyday moment"}`,
+      sceneLine(sceneDescription, locationImage, "candid everyday moment"),
       `Aspect ratio: ${aspectRatio} (${aspectRatio === "9:16" ? "vertical phone framing" : aspectRatio === "16:9" ? "horizontal framing" : "square framing"})`,
-      `Depict this person's age as: ${ageRange}`,
-      `Depict this person's body weight/build as: ${bodyWeight} (adjust from the reference photo if different)`,
-      `Depict this person's chest size as: ${boobsSize} (adjust from the reference photo if different)`,
+      ...bodyLines(ageRange, bodyWeight, boobsSize),
       `Sexy mode: ${sexyMode ? "ON — apply sexy mode instructions" : "off"}`,
     ];
     if (customInstructions) lines.push(`Custom instructions: ${customInstructions}`);
@@ -116,9 +146,7 @@ app.post("/api/generate/character-sheet", async (req, res) => {
       type: "text",
       text: [
         "Generate the 3-panel character reference sheet prompt.",
-        `Depict this person's age as: ${ageRange}`,
-        `Depict this person's body weight/build as: ${bodyWeight} (adjust from the reference photo if different)`,
-        `Depict this person's chest size as: ${boobsSize} (adjust from the reference photo if different)`,
+        ...bodyLines(ageRange, bodyWeight, boobsSize),
         `Sexy mode: ${sexyMode ? "ON — apply sexy mode instructions" : "off"}`,
       ].join("\n"),
     });
@@ -139,7 +167,7 @@ app.post("/api/generate/environment", async (req, res) => {
     pushLabeledImage(content, "Location reference (match this setting):", locationImage);
     content.push({
       type: "text",
-      text: `Scene description: ${sceneDescription || "an everyday setting"}\nAspect ratio: ${aspectRatio}`,
+      text: `${sceneLine(sceneDescription, locationImage, "an everyday setting")}\nAspect ratio: ${aspectRatio}`,
     });
 
     const prompt = await generatePrompt(ENVIRONMENT_SYSTEM_PROMPT, content);
