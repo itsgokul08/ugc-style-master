@@ -85,3 +85,14 @@ export function generateEnvironmentPrompt(input: {
 }) {
   return post<{ prompt: string }>("/api/generate/environment", input);
 }
+
+export function generateReversePrompt(input: {
+  baseImage: string;
+  outfitImage?: string;
+  sexyMode: boolean;
+  ageRange: number;
+  bodyWeight: BodyWeight;
+  boobsSize: BoobsSize;
+}) {
+  return post<{ prompt: string }>("/api/generate/reverse", input);
+}

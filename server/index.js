@@ -4,7 +4,12 @@ import { fileURLToPath } from "url";
 import express from "express";
 import cors from "cors";
 import Anthropic from "@anthropic-ai/sdk";
-import { UGC_SYSTEM_PROMPT, CHARACTER_SHEET_SYSTEM_PROMPT, ENVIRONMENT_SYSTEM_PROMPT } from "./prompts.js";
+import {
+  UGC_SYSTEM_PROMPT,
+  CHARACTER_SHEET_SYSTEM_PROMPT,
+  ENVIRONMENT_SYSTEM_PROMPT,
+  REVERSE_ENGINEER_SYSTEM_PROMPT,
+} from "./prompts.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const clientDist = path.join(__dirname, "../client/dist");
@@ -171,6 +176,37 @@ app.post("/api/generate/environment", async (req, res) => {
     });
 
     const prompt = await generatePrompt(ENVIRONMENT_SYSTEM_PROMPT, content);
+    res.json({ ok: true, value: { prompt } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post("/api/generate/reverse", async (req, res) => {
+  try {
+    const {
+      baseImage,
+      outfitImage,
+      sexyMode = false,
+      ageRange = 25,
+      bodyWeight = "average",
+      boobsSize = "medium",
+    } = req.body;
+
+    if (!baseImage) return res.status(400).json({ ok: false, error: "baseImage is required" });
+
+    const content = [];
+    pushLabeledImage(content, "Base image (reverse-engineer the prompt that could have generated this image):", baseImage);
+    pushLabeledImage(content, "Outfit reference (describe THIS outfit instead of the base image's outfit):", outfitImage);
+    content.push({
+      type: "text",
+      text: [...bodyLines(ageRange, bodyWeight, boobsSize), `Sexy mode: ${sexyMode ? "ON — apply sexy mode instructions" : "off"}`].join(
+        "\n"
+      ),
+    });
+
+    const prompt = await generatePrompt(REVERSE_ENGINEER_SYSTEM_PROMPT, content);
     res.json({ ok: true, value: { prompt } });
   } catch (err) {
     console.error(err);
