@@ -54,6 +54,7 @@ app.post("/api/generate/ugc", async (req, res) => {
       referenceImage,
       outfitImage,
       locationImage,
+      poseImage,
       sceneDescription,
       aspectRatio = "9:16",
       sexyMode = false,
@@ -69,6 +70,11 @@ app.post("/api/generate/ugc", async (req, res) => {
     pushLabeledImage(content, "Reference photo (identity and face to preserve exactly; body adjusted per parameters below):", referenceImage);
     pushLabeledImage(content, "Outfit reference (match this clothing style):", outfitImage);
     pushLabeledImage(content, "Location reference (match this setting):", locationImage);
+    pushLabeledImage(
+      content,
+      "Pose reference (match ONLY the body pose, camera angle, distance, and framing shown in this image — ignore its clothing, setting, background, and the identity of any person in it):",
+      poseImage
+    );
 
     const lines = [
       `Scene description: ${sceneDescription || "candid everyday moment"}`,

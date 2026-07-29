@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Shirt, Mountain, SlidersHorizontal, ImagePlus } from "lucide-react";
+import { Shirt, Mountain, SlidersHorizontal, ImagePlus, PersonStanding } from "lucide-react";
 import { UploadDropZone } from "./components/UploadDropZone";
 import { GalleryModal } from "./components/GalleryModal";
 import { PromptCard } from "./components/PromptCard";
@@ -12,10 +12,12 @@ export default function App() {
   const [reference, setReference] = useState<ReferenceAsset | null>(null);
   const [outfitRef, setOutfitRef] = useState<ReferenceAsset | null>(null);
   const [locationRef, setLocationRef] = useState<ReferenceAsset | null>(null);
+  const [poseRef, setPoseRef] = useState<ReferenceAsset | null>(null);
 
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingOutfit, setIsUploadingOutfit] = useState(false);
   const [isUploadingLocation, setIsUploadingLocation] = useState(false);
+  const [isUploadingPose, setIsUploadingPose] = useState(false);
 
   const [sceneDescription, setSceneDescription] = useState(SCENE_PRESETS[0].description);
   const [activePreset, setActivePreset] = useState(SCENE_PRESETS[0].id);
@@ -44,14 +46,22 @@ export default function App() {
   const setForTarget = useCallback((target: PickerTarget, asset: ReferenceAsset) => {
     if (target === "reference") setReference(asset);
     else if (target === "outfit") setOutfitRef(asset);
+    else if (target === "pose") setPoseRef(asset);
     else setLocationRef(asset);
   }, []);
+
+  const UPLOADING_SETTERS: Record<PickerTarget, (v: boolean) => void> = {
+    reference: setIsUploading,
+    outfit: setIsUploadingOutfit,
+    location: setIsUploadingLocation,
+    pose: setIsUploadingPose,
+  };
 
   const handleFiles = useCallback(
     async (files: FileList, target: PickerTarget) => {
       const file = files[0];
       if (!file) return;
-      const setUploading = target === "reference" ? setIsUploading : target === "outfit" ? setIsUploadingOutfit : setIsUploadingLocation;
+      const setUploading = UPLOADING_SETTERS[target];
       setUploading(true);
       setError("");
       try {
@@ -107,6 +117,7 @@ export default function App() {
         referenceImage: reference.src,
         outfitImage: outfitRef?.src,
         locationImage: locationRef?.src,
+        poseImage: poseRef?.src,
         sceneDescription,
         aspectRatio,
         sexyMode,
@@ -234,7 +245,7 @@ export default function App() {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <UploadDropZone
                 label="Outfit reference"
                 description="Optional — match this clothing"
@@ -258,6 +269,18 @@ export default function App() {
                 compact
               >
                 <ImagePlus size={24} />
+              </UploadDropZone>
+              <UploadDropZone
+                label="Pose reference"
+                description="Optional — match this pose & framing"
+                asset={poseRef}
+                isUploading={isUploadingPose}
+                onFiles={(files) => handleFiles(files, "pose")}
+                onPickFromGallery={() => openGalleryPicker("pose")}
+                onRemove={() => setPoseRef(null)}
+                compact
+              >
+                <PersonStanding size={24} />
               </UploadDropZone>
             </div>
 

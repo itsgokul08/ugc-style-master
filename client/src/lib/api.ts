@@ -54,6 +54,7 @@ export function generateUgcPrompt(input: {
   referenceImage: string;
   outfitImage?: string;
   locationImage?: string;
+  poseImage?: string;
   sceneDescription: string;
   aspectRatio: AspectRatio;
   sexyMode: boolean;
