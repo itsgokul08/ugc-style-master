@@ -122,6 +122,7 @@ export function ReverseStickTab() {
               onFiles={(files) => handleFiles(files, "face")}
               onPickFromGallery={() => openGalleryPicker("face")}
               onRemove={() => setFaceRef(null)}
+              showPasteButton
               compact
             >
               <ScanFace size={24} />
@@ -134,6 +135,7 @@ export function ReverseStickTab() {
               onFiles={(files) => handleFiles(files, "outfit")}
               onPickFromGallery={() => openGalleryPicker("outfit")}
               onRemove={() => setOutfitRef(null)}
+              showPasteButton
               compact
             >
               <Shirt size={24} />

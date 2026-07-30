@@ -247,6 +247,7 @@ export function UgcTab() {
               onFiles={(files) => handleFiles(files, "outfit")}
               onPickFromGallery={() => openGalleryPicker("outfit")}
               onRemove={() => setOutfitRef(null)}
+              showPasteButton
               compact
             >
               <Shirt size={24} />
@@ -259,6 +260,7 @@ export function UgcTab() {
               onFiles={(files) => handleFiles(files, "location")}
               onPickFromGallery={() => openGalleryPicker("location")}
               onRemove={() => setLocationRef(null)}
+              showPasteButton
               compact
             >
               <ImagePlus size={24} />
@@ -271,6 +273,7 @@ export function UgcTab() {
               onFiles={(files) => handleFiles(files, "pose")}
               onPickFromGallery={() => openGalleryPicker("pose")}
               onRemove={() => setPoseRef(null)}
+              showPasteButton
               compact
             >
               <PersonStanding size={24} />
