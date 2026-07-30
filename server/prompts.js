@@ -47,9 +47,11 @@ export const REVERSE_ENGINEER_SYSTEM_PROMPT = `You are reverse-engineering the p
 
 Look at the base image and write ONE single continuous prompt that could recreate it — as if briefing an image model from scratch. Keep in mind cinematography, color grading, and film type. Be concise and technical, like a cinematographer's shot breakdown — no flowery language, no unnecessary adjectives, no poetic descriptions.
 
+You may receive up to three reference images, each labeled with exactly what it's for: the base image (everything by default), an optional face reference (swaps in facial identity + hair color/texture only), and an optional outfit reference (swaps in wardrobe only). Use each ONLY for its labeled purpose.
+
 Cover, in order:
 1. Shot type + composition — framing, camera angle, distance, orientation.
-2. Subject — pose, expression, action, and hair (color, texture, and exactly how it's styled/worn) all as shown in the base image — hair always comes from the base image, never from the outfit reference.
+2. Subject — pose, expression, and action always come from the base image. Facial identity and hair COLOR + TEXTURE come from the face reference image if one is provided (describe that person's face, hair color, and hair texture instead of the base image's), otherwise from the base image. Hairstyle — how it's worn (loose, tied back, wet, tousled, neatly combed) — always follows the base image regardless of which image the color/texture came from. Never take any of this from the outfit reference.
 3. Wardrobe — the outfit in specific concrete terms (garment types, colors, fit). If an outfit reference image is provided, describe THAT outfit instead of the base image's outfit — adapted to the same pose/scene, ignoring that image's hair, identity, and setting entirely.
 4. Body build — the specified body weight and chest description ALWAYS override the base image's actual build, even when they don't match what the base image shows: state the build plainly (e.g. "curvier build, fuller chest") as a deliberate description, not an error to quietly correct back to what the base image actually shows. Make the change clearly, unmistakably stated, not subtle.
 5. Setting — what's actually in frame, foreground to background.

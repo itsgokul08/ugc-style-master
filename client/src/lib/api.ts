@@ -88,6 +88,7 @@ export function generateEnvironmentPrompt(input: {
 
 export function generateReversePrompt(input: {
   baseImage: string;
+  faceImage?: string;
   outfitImage?: string;
   sexyMode: boolean;
   ageRange: number;

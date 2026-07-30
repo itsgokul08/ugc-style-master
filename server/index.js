@@ -187,6 +187,7 @@ app.post("/api/generate/reverse", async (req, res) => {
   try {
     const {
       baseImage,
+      faceImage,
       outfitImage,
       sexyMode = false,
       ageRange = 25,
@@ -198,6 +199,11 @@ app.post("/api/generate/reverse", async (req, res) => {
 
     const content = [];
     pushLabeledImage(content, "Base image (reverse-engineer the prompt that could have generated this image):", baseImage);
+    pushLabeledImage(
+      content,
+      "Face reference (take facial identity, hair color, and hair texture from THIS image instead of the base image — ignore its pose, hairstyle, outfit, and setting):",
+      faceImage
+    );
     pushLabeledImage(content, "Outfit reference (describe THIS outfit instead of the base image's outfit):", outfitImage);
     content.push({
       type: "text",

@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Shirt, ScanSearch, SlidersHorizontal } from "lucide-react";
+import { Shirt, ScanSearch, ScanFace, SlidersHorizontal } from "lucide-react";
 import { UploadDropZone } from "./UploadDropZone";
 import { GalleryModal } from "./GalleryModal";
 import { PromptCard } from "./PromptCard";
@@ -11,8 +11,10 @@ import type { BodyWeight, BoobsSize, PickerTarget, ReferenceAsset } from "../lib
 
 export function ReverseStickTab() {
   const [baseRef, setBaseRef] = useState<ReferenceAsset | null>(null);
+  const [faceRef, setFaceRef] = useState<ReferenceAsset | null>(null);
   const [outfitRef, setOutfitRef] = useState<ReferenceAsset | null>(null);
   const [isUploadingBase, setIsUploadingBase] = useState(false);
+  const [isUploadingFace, setIsUploadingFace] = useState(false);
   const [isUploadingOutfit, setIsUploadingOutfit] = useState(false);
 
   const [sexyMode, setSexyMode] = useState(false);
@@ -31,14 +33,21 @@ export function ReverseStickTab() {
 
   const setForTarget = useCallback((target: PickerTarget, asset: ReferenceAsset) => {
     if (target === "base") setBaseRef(asset);
+    else if (target === "face") setFaceRef(asset);
     else if (target === "outfit") setOutfitRef(asset);
   }, []);
 
+  const UPLOADING_SETTERS = {
+    base: setIsUploadingBase,
+    face: setIsUploadingFace,
+    outfit: setIsUploadingOutfit,
+  } as const;
+
   const handleFiles = useCallback(
-    async (files: FileList, target: "base" | "outfit") => {
+    async (files: FileList, target: "base" | "face" | "outfit") => {
       const file = files[0];
       if (!file) return;
-      const setUploading = target === "base" ? setIsUploadingBase : setIsUploadingOutfit;
+      const setUploading = UPLOADING_SETTERS[target];
       setUploading(true);
       setError("");
       try {
@@ -72,6 +81,7 @@ export function ReverseStickTab() {
     try {
       const v = await generateReversePrompt({
         baseImage: baseRef.src,
+        faceImage: faceRef?.src,
         outfitImage: outfitRef?.src,
         sexyMode,
         ageRange,
@@ -90,7 +100,7 @@ export function ReverseStickTab() {
     <>
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-xl md:p-6">
         <div className="space-y-5">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <UploadDropZone
               label="Base image"
               description="The AI image to reverse-engineer"
@@ -103,6 +113,18 @@ export function ReverseStickTab() {
               compact
             >
               <ScanSearch size={24} />
+            </UploadDropZone>
+            <UploadDropZone
+              label="Face reference"
+              description="Optional — use this face & hair color instead"
+              asset={faceRef}
+              isUploading={isUploadingFace}
+              onFiles={(files) => handleFiles(files, "face")}
+              onPickFromGallery={() => openGalleryPicker("face")}
+              onRemove={() => setFaceRef(null)}
+              compact
+            >
+              <ScanFace size={24} />
             </UploadDropZone>
             <UploadDropZone
               label="Outfit reference"
