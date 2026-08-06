@@ -35,6 +35,7 @@ export function UgcTab() {
 
   const [useFaceRef, setUseFaceRef] = useState(true);
   const [sexyMode, setSexyMode] = useState(false);
+  const [headroomMode, setHeadroomMode] = useState(true);
   const [ageRange, setAgeRange] = useState(25);
   const [bodyWeight, setBodyWeight] = useState<BodyWeight>("average");
   const [boobsSize, setBoobsSize] = useState<BoobsSize>("medium");
@@ -123,6 +124,7 @@ export function UgcTab() {
         sceneDescription,
         aspectRatio,
         sexyMode,
+        headroomMode,
         customInstructions: customInstructions || undefined,
         ageRange,
         bodyWeight,
@@ -358,6 +360,16 @@ export function UgcTab() {
               <p className="text-xs text-gray-500">More revealing outfit, tasteful and sensual</p>
             </div>
             <Toggle checked={sexyMode} onChange={setSexyMode} accent="pink" />
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-white/10 px-4 py-3">
+            <div>
+              <p className="text-sm text-gray-200">Headroom framing</p>
+              <p className="text-xs text-gray-500">
+                Waist-up to full-body, subject low in frame, empty space above the head
+              </p>
+            </div>
+            <Toggle checked={headroomMode} onChange={setHeadroomMode} />
           </div>
 
           {error && <p className="text-sm text-red-400">{error}</p>}

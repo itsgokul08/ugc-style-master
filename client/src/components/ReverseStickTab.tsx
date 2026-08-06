@@ -18,6 +18,7 @@ export function ReverseStickTab() {
   const [isUploadingOutfit, setIsUploadingOutfit] = useState(false);
 
   const [sexyMode, setSexyMode] = useState(false);
+  const [headroomMode, setHeadroomMode] = useState(true);
   const [customInstructions, setCustomInstructions] = useState("");
   const [ageRange, setAgeRange] = useState(25);
   const [bodyWeight, setBodyWeight] = useState<BodyWeight>("average");
@@ -85,6 +86,7 @@ export function ReverseStickTab() {
         faceImage: faceRef?.src,
         outfitImage: outfitRef?.src,
         sexyMode,
+        headroomMode,
         customInstructions: customInstructions || undefined,
         ageRange,
         bodyWeight,
@@ -215,6 +217,16 @@ export function ReverseStickTab() {
               <p className="text-xs text-gray-500">More revealing outfit, tasteful and sensual</p>
             </div>
             <Toggle checked={sexyMode} onChange={setSexyMode} accent="pink" />
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-white/10 px-4 py-3">
+            <div>
+              <p className="text-sm text-gray-200">Headroom framing</p>
+              <p className="text-xs text-gray-500">
+                Waist-up to full-body, subject low in frame, empty space above the head
+              </p>
+            </div>
+            <Toggle checked={headroomMode} onChange={setHeadroomMode} />
           </div>
 
           <div>

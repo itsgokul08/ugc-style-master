@@ -67,6 +67,11 @@ function bodyLines(ageRange, bodyWeight, boobsSize) {
   ];
 }
 
+function headroomLine(headroomMode) {
+  if (!headroomMode) return null;
+  return "Framing (headroom): use a waist-up to full-body framing with the subject positioned low in the frame, leaving roughly the top 25% of the image as empty space above their head — wall and ceiling, sky, or whatever background fills that region — deliberate headroom, not a tight crop.";
+}
+
 function sceneLine(sceneDescription, locationImage, fallback) {
   const hasText = sceneDescription && sceneDescription.trim().length > 0;
   if (hasText) return `Scene description: ${sceneDescription}`;
@@ -95,6 +100,7 @@ app.post("/api/generate/ugc", async (req, res) => {
       sceneDescription,
       aspectRatio = "9:16",
       sexyMode = false,
+      headroomMode = true,
       customInstructions,
       ageRange = 25,
       bodyWeight = "average",
@@ -116,9 +122,10 @@ app.post("/api/generate/ugc", async (req, res) => {
     const lines = [
       sceneLine(sceneDescription, locationImage, "candid everyday moment"),
       `Aspect ratio: ${aspectRatio} (${aspectRatio === "9:16" ? "vertical phone framing" : aspectRatio === "16:9" ? "horizontal framing" : "square framing"})`,
+      headroomLine(headroomMode),
       ...bodyLines(ageRange, bodyWeight, boobsSize),
       `Sexy mode: ${sexyMode ? "ON — apply sexy mode instructions" : "off"}`,
-    ];
+    ].filter(Boolean);
     if (customInstructions) lines.push(`Custom instructions: ${customInstructions}`);
     content.push({ type: "text", text: lines.join("\n") });
 
@@ -194,6 +201,7 @@ app.post("/api/generate/reverse", async (req, res) => {
       faceImage,
       outfitImage,
       sexyMode = false,
+      headroomMode = true,
       customInstructions,
       ageRange = 25,
       bodyWeight = "average",
@@ -210,7 +218,11 @@ app.post("/api/generate/reverse", async (req, res) => {
       faceImage
     );
     pushLabeledImage(content, "Outfit reference (describe THIS outfit instead of the base image's outfit):", outfitImage);
-    const lines = [...bodyLines(ageRange, bodyWeight, boobsSize), `Sexy mode: ${sexyMode ? "ON — apply sexy mode instructions" : "off"}`];
+    const lines = [
+      headroomLine(headroomMode),
+      ...bodyLines(ageRange, bodyWeight, boobsSize),
+      `Sexy mode: ${sexyMode ? "ON — apply sexy mode instructions" : "off"}`,
+    ].filter(Boolean);
     if (customInstructions) lines.push(`Custom instructions: ${customInstructions}`);
     content.push({ type: "text", text: lines.join("\n") });
 

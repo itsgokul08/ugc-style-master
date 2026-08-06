@@ -58,6 +58,7 @@ export function generateUgcPrompt(input: {
   sceneDescription: string;
   aspectRatio: AspectRatio;
   sexyMode: boolean;
+  headroomMode: boolean;
   customInstructions?: string;
   ageRange: number;
   bodyWeight: BodyWeight;
@@ -91,6 +92,7 @@ export function generateReversePrompt(input: {
   faceImage?: string;
   outfitImage?: string;
   sexyMode: boolean;
+  headroomMode: boolean;
   customInstructions?: string;
   ageRange: number;
   bodyWeight: BodyWeight;
