@@ -18,6 +18,7 @@ export function ReverseStickTab() {
   const [isUploadingOutfit, setIsUploadingOutfit] = useState(false);
 
   const [sexyMode, setSexyMode] = useState(false);
+  const [customInstructions, setCustomInstructions] = useState("");
   const [ageRange, setAgeRange] = useState(25);
   const [bodyWeight, setBodyWeight] = useState<BodyWeight>("average");
   const [boobsSize, setBoobsSize] = useState<BoobsSize>("medium");
@@ -84,6 +85,7 @@ export function ReverseStickTab() {
         faceImage: faceRef?.src,
         outfitImage: outfitRef?.src,
         sexyMode,
+        customInstructions: customInstructions || undefined,
         ageRange,
         bodyWeight,
         boobsSize,
@@ -213,6 +215,17 @@ export function ReverseStickTab() {
               <p className="text-xs text-gray-500">More revealing outfit, tasteful and sensual</p>
             </div>
             <Toggle checked={sexyMode} onChange={setSexyMode} accent="pink" />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs text-gray-500">Custom instructions (optional)</label>
+            <textarea
+              rows={2}
+              value={customInstructions}
+              onChange={(e) => setCustomInstructions(e.target.value)}
+              placeholder="Anything else the prompt should include..."
+              className="w-full resize-none rounded-lg border border-white/10 bg-white/5 p-2.5 text-sm text-gray-200 outline-none focus:border-lime-400/50"
+            />
           </div>
 
           {error && <p className="text-sm text-red-400">{error}</p>}

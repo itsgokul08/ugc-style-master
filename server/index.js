@@ -144,8 +144,12 @@ app.post("/api/generate/character-sheet", async (req, res) => {
     if (!referenceImage) return res.status(400).json({ ok: false, error: "referenceImage is required" });
 
     const content = [];
-    pushLabeledImage(content, "Reference photo (identity/face to preserve):", referenceImage);
-    pushLabeledImage(content, "Outfit reference (character MUST wear this outfit, not the one in the face photo):", outfitImage);
+    pushLabeledImage(content, "Reference photo (identity/face and hair color/texture to preserve):", referenceImage);
+    pushLabeledImage(
+      content,
+      "Outfit reference (character MUST wear this outfit, not the one in the reference photo — and take hairstyle, how the hair is worn/combed, from this image too):",
+      outfitImage
+    );
     pushLabeledImage(content, "Location/style reference (optional mood reference only):", locationImage);
     content.push({
       type: "text",
@@ -190,6 +194,7 @@ app.post("/api/generate/reverse", async (req, res) => {
       faceImage,
       outfitImage,
       sexyMode = false,
+      customInstructions,
       ageRange = 25,
       bodyWeight = "average",
       boobsSize = "medium",
@@ -205,12 +210,9 @@ app.post("/api/generate/reverse", async (req, res) => {
       faceImage
     );
     pushLabeledImage(content, "Outfit reference (describe THIS outfit instead of the base image's outfit):", outfitImage);
-    content.push({
-      type: "text",
-      text: [...bodyLines(ageRange, bodyWeight, boobsSize), `Sexy mode: ${sexyMode ? "ON — apply sexy mode instructions" : "off"}`].join(
-        "\n"
-      ),
-    });
+    const lines = [...bodyLines(ageRange, bodyWeight, boobsSize), `Sexy mode: ${sexyMode ? "ON — apply sexy mode instructions" : "off"}`];
+    if (customInstructions) lines.push(`Custom instructions: ${customInstructions}`);
+    content.push({ type: "text", text: lines.join("\n") });
 
     const prompt = await generatePrompt(REVERSE_ENGINEER_SYSTEM_PROMPT, content);
     res.json({ ok: true, value: { prompt } });

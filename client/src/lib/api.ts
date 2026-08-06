@@ -91,6 +91,7 @@ export function generateReversePrompt(input: {
   faceImage?: string;
   outfitImage?: string;
   sexyMode: boolean;
+  customInstructions?: string;
   ageRange: number;
   bodyWeight: BodyWeight;
   boobsSize: BoobsSize;
