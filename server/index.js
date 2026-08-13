@@ -59,9 +59,22 @@ const BOOBS_SIZE_DESCRIPTIONS = {
   large: "large chest — noticeably full, prominent bust",
 };
 
-function bodyLines(ageRange, bodyWeight, boobsSize) {
+// Some downstream image generators (e.g. Seedream) protect a reference photo's
+// body geometry far more strongly than they respect text descriptions of it, so
+// even a forceful text override can lose to the identity photo's actual build.
+// When the user supplies an actual body-reference photo instead, we drop the
+// slider text entirely and point the model at that image instead — copying a
+// real photo's proportions is far more reliable than describing a target build.
+function bodyLines(ageRange, bodyWeight, boobsSize, hasBodyImage) {
+  const ageLine = `Depict this person's age as: ${ageRange}`;
+  if (hasBodyImage) {
+    return [
+      ageLine,
+      "A body-reference image is provided separately, labeled for exactly this purpose — copy that person's actual body build, waist-to-hip proportions, and chest size precisely for this image (not the identity reference photo's build), making the shift clearly and unmistakably visible while keeping the same shoulder width, frame, and identity as the main reference photo.",
+    ];
+  }
   return [
-    `Depict this person's age as: ${ageRange}`,
+    ageLine,
     `Depict this person's body as having a ${BODY_WEIGHT_DESCRIPTIONS[bodyWeight] || bodyWeight} — this description takes priority over the reference photo if it differs, and the difference should be clearly visible, not subtle`,
     `Depict this person's chest as having a ${BOOBS_SIZE_DESCRIPTIONS[boobsSize] || boobsSize} — this description takes priority over the reference photo if it differs, and the difference should be clearly visible, not subtle`,
   ];
@@ -97,6 +110,7 @@ app.post("/api/generate/ugc", async (req, res) => {
       outfitImage,
       locationImage,
       poseImage,
+      bodyImage,
       sceneDescription,
       aspectRatio = "9:16",
       sexyMode = false,
@@ -118,12 +132,17 @@ app.post("/api/generate/ugc", async (req, res) => {
       "Pose reference (match ONLY the body pose, camera angle, distance, and framing shown in this image — ignore its clothing, setting, background, and the identity of any person in it):",
       poseImage
     );
+    pushLabeledImage(
+      content,
+      "Body reference (copy this person's actual body build — waist-to-hip ratio, hip/thigh fullness, chest size, overall silhouette — for this image; ignore this photo's face, hair, outfit, and background entirely):",
+      bodyImage
+    );
 
     const lines = [
       sceneLine(sceneDescription, locationImage, "candid everyday moment"),
       `Aspect ratio: ${aspectRatio} (${aspectRatio === "9:16" ? "vertical phone framing" : aspectRatio === "16:9" ? "horizontal framing" : "square framing"})`,
       headroomLine(headroomMode),
-      ...bodyLines(ageRange, bodyWeight, boobsSize),
+      ...bodyLines(ageRange, bodyWeight, boobsSize, Boolean(bodyImage)),
       `Sexy mode: ${sexyMode ? "ON — apply sexy mode instructions" : "off"}`,
     ].filter(Boolean);
     if (customInstructions) lines.push(`Custom instructions: ${customInstructions}`);
@@ -143,6 +162,7 @@ app.post("/api/generate/character-sheet", async (req, res) => {
       referenceImage,
       outfitImage,
       locationImage,
+      bodyImage,
       sexyMode = false,
       ageRange = 25,
       bodyWeight = "average",
@@ -158,11 +178,16 @@ app.post("/api/generate/character-sheet", async (req, res) => {
       outfitImage
     );
     pushLabeledImage(content, "Location/style reference (optional mood reference only):", locationImage);
+    pushLabeledImage(
+      content,
+      "Body reference (copy this person's actual body build — waist-to-hip ratio, hip/thigh fullness, chest size, overall silhouette — for this image; ignore this photo's face, hair, outfit, and background entirely):",
+      bodyImage
+    );
     content.push({
       type: "text",
       text: [
         "Generate the 3-panel character reference sheet prompt.",
-        ...bodyLines(ageRange, bodyWeight, boobsSize),
+        ...bodyLines(ageRange, bodyWeight, boobsSize, Boolean(bodyImage)),
         `Sexy mode: ${sexyMode ? "ON — apply sexy mode instructions" : "off"}`,
       ].join("\n"),
     });

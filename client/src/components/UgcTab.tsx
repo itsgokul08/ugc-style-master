@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Shirt, Mountain, SlidersHorizontal, ImagePlus, PersonStanding } from "lucide-react";
+import { Shirt, Mountain, SlidersHorizontal, ImagePlus, PersonStanding, Ruler } from "lucide-react";
 import { UploadDropZone } from "./UploadDropZone";
 import { GalleryModal } from "./GalleryModal";
 import { PromptCard } from "./PromptCard";
@@ -14,11 +14,13 @@ export function UgcTab() {
   const [outfitRef, setOutfitRef] = useState<ReferenceAsset | null>(null);
   const [locationRef, setLocationRef] = useState<ReferenceAsset | null>(null);
   const [poseRef, setPoseRef] = useState<ReferenceAsset | null>(null);
+  const [bodyRef, setBodyRef] = useState<ReferenceAsset | null>(null);
 
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingOutfit, setIsUploadingOutfit] = useState(false);
   const [isUploadingLocation, setIsUploadingLocation] = useState(false);
   const [isUploadingPose, setIsUploadingPose] = useState(false);
+  const [isUploadingBody, setIsUploadingBody] = useState(false);
 
   const [sceneDescription, setSceneDescription] = useState(SCENE_PRESETS[0].description);
   const [activePreset, setActivePreset] = useState(SCENE_PRESETS[0].id);
@@ -50,6 +52,7 @@ export function UgcTab() {
     else if (target === "outfit") setOutfitRef(asset);
     else if (target === "pose") setPoseRef(asset);
     else if (target === "location") setLocationRef(asset);
+    else if (target === "body") setBodyRef(asset);
   }, []);
 
   const UPLOADING_SETTERS: Partial<Record<PickerTarget, (v: boolean) => void>> = {
@@ -57,6 +60,7 @@ export function UgcTab() {
     outfit: setIsUploadingOutfit,
     location: setIsUploadingLocation,
     pose: setIsUploadingPose,
+    body: setIsUploadingBody,
   };
 
   const handleFiles = useCallback(
@@ -121,6 +125,7 @@ export function UgcTab() {
         outfitImage: outfitRef?.src,
         locationImage: locationRef?.src,
         poseImage: poseRef?.src,
+        bodyImage: bodyRef?.src,
         sceneDescription,
         aspectRatio,
         sexyMode,
@@ -147,6 +152,7 @@ export function UgcTab() {
         referenceImage: reference.src,
         outfitImage: outfitRef?.src,
         locationImage: locationRef?.src,
+        bodyImage: bodyRef?.src,
         sexyMode,
         ageRange,
         bodyWeight,
@@ -289,6 +295,23 @@ export function UgcTab() {
             </div>
 
             <div className="mb-4">
+              <p className="mb-1.5 text-xs text-gray-500">Body reference (optional)</p>
+              <UploadDropZone
+                label=""
+                description="Photo with the target build — overrides the sliders below"
+                asset={bodyRef}
+                isUploading={isUploadingBody}
+                onFiles={(files) => handleFiles(files, "body")}
+                onPickFromGallery={() => openGalleryPicker("body")}
+                onRemove={() => setBodyRef(null)}
+                showPasteButton
+                compact
+              >
+                <Ruler size={24} />
+              </UploadDropZone>
+            </div>
+
+            <div className="mb-4">
               <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
                 <span>Age</span>
                 <span className="text-gray-300">{ageRange}</span>
@@ -303,8 +326,10 @@ export function UgcTab() {
               />
             </div>
 
-            <div className="mb-4">
-              <p className="mb-1.5 text-xs text-gray-500">Body weight</p>
+            <div className={`mb-4 ${bodyRef ? "pointer-events-none opacity-40" : ""}`}>
+              <p className="mb-1.5 text-xs text-gray-500">
+                Body weight{bodyRef && " — ignored, using body reference photo"}
+              </p>
               <div className="flex gap-2">
                 {BODY_WEIGHT_OPTIONS.map((opt) => (
                   <button
@@ -322,8 +347,10 @@ export function UgcTab() {
               </div>
             </div>
 
-            <div>
-              <p className="mb-1.5 text-xs text-gray-500">Chest size</p>
+            <div className={bodyRef ? "pointer-events-none opacity-40" : ""}>
+              <p className="mb-1.5 text-xs text-gray-500">
+                Chest size{bodyRef && " — ignored, using body reference photo"}
+              </p>
               <div className="flex gap-2">
                 {BOOBS_OPTIONS.map((opt) => (
                   <button

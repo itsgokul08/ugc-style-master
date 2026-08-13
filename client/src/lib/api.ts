@@ -55,6 +55,7 @@ export function generateUgcPrompt(input: {
   outfitImage?: string;
   locationImage?: string;
   poseImage?: string;
+  bodyImage?: string;
   sceneDescription: string;
   aspectRatio: AspectRatio;
   sexyMode: boolean;
@@ -71,6 +72,7 @@ export function generateCharacterSheetPrompt(input: {
   referenceImage: string;
   outfitImage?: string;
   locationImage?: string;
+  bodyImage?: string;
   sexyMode: boolean;
   ageRange: number;
   bodyWeight: BodyWeight;
