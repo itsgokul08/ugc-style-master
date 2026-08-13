@@ -42,6 +42,17 @@ function pushLabeledImage(content, label, dataUrl) {
   content.push(block);
 }
 
+// Marks the current end of `content` as a prompt-cache breakpoint. Call this
+// right after pushing all reference images, before appending the per-request
+// dynamic text (sliders, scene description) — so a regenerate with the same
+// reference photos reuses the cached system-prompt + image tokens instead of
+// paying full price for them every time.
+function markCacheBreakpoint(content) {
+  if (content.length > 0) {
+    content[content.length - 1].cache_control = { type: "ephemeral" };
+  }
+}
+
 // Raw slider values ("curvy", "large") on their own are too weak a signal for the
 // model to visibly commit to over a real reference photo. Expanding them into a
 // vivid physical description gives it something concrete to actually render.
@@ -96,7 +107,10 @@ async function generatePrompt(systemPrompt, content) {
   const response = await anthropic.messages.create({
     model: MODEL,
     max_tokens: 1300,
-    system: systemPrompt,
+    // Caching the (fixed, identical-every-call) system prompt means only the
+    // first call of each session pays full price for it; every later call to
+    // the same route reads it back at ~10% of the cost.
+    system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
     messages: [{ role: "user", content }],
   });
   const textBlock = response.content.find((block) => block.type === "text");
@@ -137,6 +151,7 @@ app.post("/api/generate/ugc", async (req, res) => {
       "Body reference (copy this person's actual body build — waist-to-hip ratio, hip/thigh fullness, chest size, overall silhouette — for this image; ignore this photo's face, hair, outfit, and background entirely):",
       bodyImage
     );
+    markCacheBreakpoint(content);
 
     const lines = [
       sceneLine(sceneDescription, locationImage, "candid everyday moment"),
@@ -183,6 +198,7 @@ app.post("/api/generate/character-sheet", async (req, res) => {
       "Body reference (copy this person's actual body build — waist-to-hip ratio, hip/thigh fullness, chest size, overall silhouette — for this image; ignore this photo's face, hair, outfit, and background entirely):",
       bodyImage
     );
+    markCacheBreakpoint(content);
     content.push({
       type: "text",
       text: [
@@ -206,6 +222,7 @@ app.post("/api/generate/environment", async (req, res) => {
 
     const content = [];
     pushLabeledImage(content, "Location reference (match this setting):", locationImage);
+    markCacheBreakpoint(content);
     content.push({
       type: "text",
       text: `${sceneLine(sceneDescription, locationImage, "an everyday setting")}\nAspect ratio: ${aspectRatio}`,
@@ -243,6 +260,7 @@ app.post("/api/generate/reverse", async (req, res) => {
       faceImage
     );
     pushLabeledImage(content, "Outfit reference (describe THIS outfit instead of the base image's outfit):", outfitImage);
+    markCacheBreakpoint(content);
     const lines = [
       headroomLine(headroomMode),
       ...bodyLines(ageRange, bodyWeight, boobsSize),
