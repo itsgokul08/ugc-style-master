@@ -3,7 +3,7 @@ import {AbsoluteFill, useCurrentFrame} from 'remotion';
 import {ArrowRightIcon} from '../components/Icons';
 import {SpotifyLogo} from '../components/SpotifyLogo';
 import {WordReveal} from '../components/WordReveal';
-import {beatPulse, C, EASE, FONT, FONT_TEXT, FPS, lerp, rand, SCENES, sp, tween} from '../theme';
+import {beatPulse, C, EASE, FONT, FONT_TEXT, FPS, gradText, HEADLINE, lerp, rand, SCENES, sp, tween} from '../theme';
 
 const WORD = 'Spotify';
 // Lockup geometry
@@ -42,7 +42,8 @@ export const S6Outro: React.FC = () => {
   const wordP = tween(frame, 1.22, 1.78, 0, 1, EASE.out);
   const shock = tween(frame, 0.0, 0.9, 0, 1, EASE.out);
   const pulse = beatPulse(gt, 6);
-  const push = tween(frame, 0, 3, 1, 1.045, (x) => x);
+  const push = tween(frame, 0, 3, 1, 1.09, (x) => x); // never stops moving, even on the last frame
+  const sweep = tween(frame, 2.2, 3.0, -0.2, 1.2, EASE.inOutSoft);
 
   const cta = sp(frame, 2.0, {damping: 13, stiffness: 160});
   const shimmer = tween(frame, 2.35, 2.95, -0.3, 1.3, EASE.inOutSoft);
@@ -142,13 +143,30 @@ export const S6Outro: React.FC = () => {
           <SpotifyLogo size={logoSize} arcs={arcs} />
         </div>
 
+        {/* light sweep over the lockup */}
+        <div
+          style={{
+            position: 'absolute',
+            top: LOCK_Y - 200,
+            height: 400,
+            left: `${sweep * 100}%`,
+            width: 260,
+            marginLeft: -130,
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)',
+            transform: 'skewX(-20deg)',
+            mixBlendMode: 'screen',
+            opacity: sweep > -0.2 && sweep < 1.2 ? 1 : 0,
+          }}
+        />
+
         {/* tagline */}
         <div style={{position: 'absolute', top: 640, left: 0, right: 0, display: 'flex', justifyContent: 'center'}}>
           <WordReveal
-            words={['Music', 'for', {text: 'everyone.', style: {color: C.green}}]}
+            words={['Music', 'for', {text: 'everyone.', style: gradText('#FFFFFF', C.green, 10)}]}
             start={1.62}
             stagger={0.09}
-            style={{fontFamily: FONT, fontWeight: 700, fontSize: 64, letterSpacing: '-0.035em', color: C.white}}
+            style={{...HEADLINE, fontSize: 76}}
+            wordStyle={gradText()}
             wordGap="0.24em"
           />
         </div>

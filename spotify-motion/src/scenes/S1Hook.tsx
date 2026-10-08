@@ -1,8 +1,9 @@
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
+import {Drift} from '../components/Drift';
 import {SilkWave} from '../components/SilkWave';
 import {WordReveal} from '../components/WordReveal';
-import {beatPulse, C, EASE, FONT, FPS, lerp, sp, tween} from '../theme';
+import {beatPulse, C, EASE, FPS, gradText, HEADLINE, lerp, sp, SUBTITLE, tween} from '../theme';
 
 /** 0–3s · "What does your day sound like?" A single green pulse unfurls into a silk-ribbon waveform. */
 export const S1Hook: React.FC = () => {
@@ -20,9 +21,7 @@ export const S1Hook: React.FC = () => {
   const kick = t > 0.9 ? beatPulse(t, 6) : 0;
 
   const accent: React.CSSProperties = {
-    background: 'linear-gradient(92deg, #1ED760 0%, #8CFFB9 55%, #1ED760 100%)',
-    backgroundSize: '200% 100%',
-    backgroundPosition: `${(t * 60) % 200}% 0`,
+    background: `linear-gradient(92deg, #1ED760 0%, #B6FFCF ${40 + Math.sin(t * 2) * 15}%, #1ED760 100%)`,
     WebkitBackgroundClip: 'text',
     backgroundClip: 'text',
     color: 'transparent',
@@ -37,6 +36,7 @@ export const S1Hook: React.FC = () => {
         opacity: 1 - exit,
       }}
     >
+      <Drift dur={3} zoom={0.07} panY={-14}>
       {/* Green dot: the seed of the waveform */}
       <div
         style={{
@@ -70,27 +70,36 @@ export const S1Hook: React.FC = () => {
       <div
         style={{
           position: 'absolute',
-          top: 250,
+          top: 200,
           left: 0,
           right: 0,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          fontFamily: FONT,
-          fontWeight: 800,
-          fontSize: 132,
-          lineHeight: 1.02,
-          letterSpacing: '-0.05em',
-          color: C.white,
         }}
       >
-        <WordReveal words={['What', 'does', 'your']} start={0.55} stagger={0.08} />
-        <WordReveal
-          words={['day', {text: 'sound', style: accent}, 'like?']}
-          start={0.82}
-          stagger={0.09}
-        />
+        <div
+          style={{
+            ...SUBTITLE,
+            opacity: tween(frame, 0.4, 0.75, 0, 1),
+            transform: `translateY(${tween(frame, 0.4, 0.85, 14, 0)}px)`,
+            marginBottom: 14,
+          }}
+        >
+          Spotify · Music for every moment
+        </div>
+        <div style={{...HEADLINE, fontSize: 150, lineHeight: 1.04, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          <WordReveal words={['What', 'does', 'your']} start={0.55} stagger={0.08} wordStyle={gradText()} wordGap="0.22em" />
+          <WordReveal
+            words={['day', {text: 'sound', style: accent}, 'like?']}
+            start={0.82}
+            stagger={0.09}
+            wordStyle={gradText()}
+            wordGap="0.22em"
+          />
+        </div>
       </div>
+      </Drift>
     </AbsoluteFill>
   );
 };

@@ -4,8 +4,10 @@ import type {Feature, MultiLineString} from 'geojson';
 import {feature} from 'topojson-client';
 import landTopo from 'world-atlas/land-110m.json';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
+import {Drift} from '../components/Drift';
 import {WaveIcon} from '../components/Icons';
-import {C, EASE, FONT, FONT_TEXT, FPS, lerp, rand, sp, tween} from '../theme';
+import {Stage} from '../components/Stage';
+import {C, EASE, FONT, FONT_TEXT, FPS, gradText, HEADLINE, lerp, rand, SCENES, sp, SUBTITLE, tween} from '../theme';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const LAND = feature(landTopo as any, (landTopo as any).objects.land) as unknown as Feature;
@@ -59,7 +61,7 @@ const STATS = [
   {x: 1330, y: 655, value: 180, suffix: '+', label: 'markets worldwide', icon: 'globe', at: 0.85},
 ];
 
-const HEADLINE = 'The world listens.';
+const TITLE = 'The world listens.';
 
 const StatIcon: React.FC<{kind: string}> = ({kind}) => {
   if (kind === 'wave') return <WaveIcon size={24} color="#E8FFE9" />;
@@ -99,6 +101,10 @@ export const S5Stats: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      <AbsoluteFill style={{opacity: 1 - exit}}>
+        <Stage offset={SCENES.stats.start} glowY={115} />
+      </AbsoluteFill>
+      <Drift dur={2.5} zoom={0.05} panY={-10}>
       {/* stars */}
       <svg width={1920} height={1080} style={{position: 'absolute', inset: 0, opacity: tween(frame, 0, 0.6, 0, 1) * (1 - exit)}}>
         {STARS.map((st, i) => (
@@ -117,7 +123,7 @@ export const S5Stats: React.FC = () => {
             width: R * 2.7,
             height: R * 2.7,
             borderRadius: '50%',
-            background: `radial-gradient(circle closest-side, transparent ${atm * 100 - 1}%, rgba(170,255,120,0.30) ${atm * 100 + 0.5}%, rgba(30,215,96,0.10) ${atm * 100 + 8}%, transparent 100%)`,
+            background: `radial-gradient(circle closest-side, transparent ${atm * 100 - 1}%, rgba(30,215,96,0.38) ${atm * 100 + 0.5}%, rgba(30,215,96,0.10) ${atm * 100 + 8}%, transparent 100%)`,
           }}
         />
         {/* sun-side glow, top-right */}
@@ -128,31 +134,31 @@ export const S5Stats: React.FC = () => {
             top: GY - R * 1.25,
             width: R * 1.2,
             height: R * 0.8,
-            background: 'radial-gradient(ellipse at 50% 60%, rgba(190,255,120,0.38) 0%, transparent 65%)',
+            background: 'radial-gradient(ellipse at 50% 60%, rgba(30,215,96,0.4) 0%, rgba(15,163,177,0.12) 45%, transparent 68%)',
             filter: 'blur(20px)',
           }}
         />
         <svg width={1920} height={1080} style={{position: 'absolute', inset: 0, overflow: 'visible'}}>
           <defs>
             <radialGradient id="g-body" cx="68%" cy="10%" r="95%">
-              <stop offset="0" stopColor="#2E8A45" />
-              <stop offset="0.3" stopColor="#0F4A24" />
-              <stop offset="0.65" stopColor="#052414" />
-              <stop offset="1" stopColor="#020B05" />
+              <stop offset="0" stopColor="#168A44" />
+              <stop offset="0.3" stopColor="#0A4524" />
+              <stop offset="0.65" stopColor="#03200F" />
+              <stop offset="1" stopColor="#010604" />
             </radialGradient>
             <linearGradient id="g-land" gradientUnits="userSpaceOnUse" x1={GX + R * 0.7} y1={GY - R} x2={GX - R * 0.7} y2={GY}>
-              <stop offset="0" stopColor="#F2FFE8" stopOpacity="0.92" />
-              <stop offset="0.5" stopColor="#C4F0C0" stopOpacity="0.72" />
-              <stop offset="1" stopColor="#7DB582" stopOpacity="0.45" />
+              <stop offset="0" stopColor="#E9FFF1" stopOpacity="0.92" />
+              <stop offset="0.5" stopColor="#8CFFB9" stopOpacity="0.62" />
+              <stop offset="1" stopColor="#1ED760" stopOpacity="0.35" />
             </linearGradient>
             <radialGradient id="g-shade" cx="70%" cy="5%" r="100%">
               <stop offset="0.35" stopColor="#000" stopOpacity="0" />
               <stop offset="1" stopColor="#000" stopOpacity="0.65" />
             </radialGradient>
             <linearGradient id="g-rim" gradientUnits="userSpaceOnUse" x1={GX - R} y1={GY} x2={GX + R * 0.6} y2={GY - R}>
-              <stop offset="0" stopColor="#B8FF6A" stopOpacity="0" />
-              <stop offset="0.55" stopColor="#B8FF6A" stopOpacity="0.35" />
-              <stop offset="1" stopColor="#EAFFB8" stopOpacity="1" />
+              <stop offset="0" stopColor="#1ED760" stopOpacity="0" />
+              <stop offset="0.55" stopColor="#1ED760" stopOpacity="0.45" />
+              <stop offset="1" stopColor="#B6FFCF" stopOpacity="1" />
             </linearGradient>
             <filter id="g-glow" x="-10%" y="-10%" width="120%" height="120%">
               <feGaussianBlur stdDeviation="3" result="b" />
@@ -191,8 +197,8 @@ export const S5Stats: React.FC = () => {
             const pulse = hot ? (t * 0.9 + rand(i)) % 1 : 0;
             return (
               <g key={i} opacity={pop}>
-                {hot && <circle cx={p[0]} cy={p[1]} r={4 + pulse * 22} fill="none" stroke="#B8FF6A" strokeWidth={1.5} opacity={(1 - pulse) * 0.8} />}
-                <circle cx={p[0]} cy={p[1]} r={hot ? 4.5 : 2.8} fill={hot ? '#EAFFB8' : '#9DFFB5'} filter="url(#g-glow)" />
+                {hot && <circle cx={p[0]} cy={p[1]} r={4 + pulse * 22} fill="none" stroke="#1ED760" strokeWidth={1.5} opacity={(1 - pulse) * 0.8} />}
+                <circle cx={p[0]} cy={p[1]} r={hot ? 4.5 : 2.8} fill={hot ? '#E9FFF1' : '#8CFFB9'} filter="url(#g-glow)" />
               </g>
             );
           })}
@@ -209,7 +215,7 @@ export const S5Stats: React.FC = () => {
             top: 860,
             width: 900,
             height: 120,
-            background: 'linear-gradient(90deg, transparent, rgba(220,255,170,0.45), rgba(150,220,255,0.25), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgba(180,255,210,0.4), rgba(53,208,192,0.22), transparent)',
             filter: 'blur(18px)',
             transform: `rotate(-38deg) translateX(${Math.sin(t * 0.8) * 30}px)`,
             mixBlendMode: 'screen',
@@ -223,9 +229,7 @@ export const S5Stats: React.FC = () => {
           <div style={{width: 1440}}>
             <div
               style={{
-                fontFamily: FONT_TEXT,
-                fontSize: 26,
-                color: 'rgba(255,255,255,0.55)',
+                ...SUBTITLE,
                 marginLeft: 12,
                 opacity: tween(frame, 0.1, 0.45, 0, 1),
                 transform: `translateY(${tween(frame, 0.1, 0.5, 14, 0)}px)`,
@@ -235,10 +239,8 @@ export const S5Stats: React.FC = () => {
             </div>
             <div
               style={{
-                fontFamily: FONT,
-                fontWeight: 300,
+                ...HEADLINE,
                 fontSize: 182,
-                letterSpacing: '-0.035em',
                 lineHeight: 1.05,
                 marginTop: 6,
                 whiteSpace: 'pre',
@@ -246,17 +248,14 @@ export const S5Stats: React.FC = () => {
                 justifyContent: 'center',
               }}
             >
-              {HEADLINE.split('').map((ch, i) => {
+              {TITLE.split('').map((ch, i) => {
                 const p = tween(frame, 0.15 + i * 0.025, 0.75 + i * 0.025, 0, 1, EASE.out);
                 return (
                   <span
                     key={i}
                     style={{
                       display: 'inline-block',
-                      background: 'linear-gradient(180deg, #FFFFFF 25%, rgba(255,255,255,0.55) 100%)',
-                      WebkitBackgroundClip: 'text',
-                      backgroundClip: 'text',
-                      color: 'transparent',
+                      ...gradText(),
                       opacity: p,
                       filter: p < 0.99 ? `blur(${(1 - p) * 14}px)` : undefined,
                       transform: `translateY(${(1 - p) * 40}px)`,
@@ -287,7 +286,7 @@ export const S5Stats: React.FC = () => {
                 gap: 18,
                 padding: '18px 30px 18px 18px',
                 borderRadius: 20,
-                background: 'linear-gradient(180deg, rgba(40,60,44,0.55), rgba(12,22,15,0.55))',
+                background: 'linear-gradient(180deg, rgba(34,48,40,0.55), rgba(8,16,11,0.6))',
                 backdropFilter: 'blur(14px)',
                 WebkitBackdropFilter: 'blur(14px)',
                 border: '1px solid rgba(255,255,255,0.16)',
@@ -323,6 +322,7 @@ export const S5Stats: React.FC = () => {
           );
         })}
       </AbsoluteFill>
+      </Drift>
     </AbsoluteFill>
   );
 };

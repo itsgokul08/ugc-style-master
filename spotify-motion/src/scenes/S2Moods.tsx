@@ -1,9 +1,10 @@
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
 import {Cover, PALETTES, Palette} from '../components/Cover';
+import {Drift} from '../components/Drift';
 import {PlayIcon} from '../components/Icons';
 import {WordReveal} from '../components/WordReveal';
-import {C, EASE, FONT, FONT_TEXT, FPS, lerp, sp, tween} from '../theme';
+import {C, EASE, FONT_TEXT, FPS, gradText, HEADLINE, lerp, sp, SUBTITLE, tween} from '../theme';
 
 // Slot word swaps land on the beat (local seconds). Each swap spins the carousel one card.
 const MOODS = [
@@ -39,7 +40,8 @@ export const S2Moods: React.FC = () => {
   const spinIn = sp(frame, 0.05, {damping: 22, stiffness: 70});
 
   // Continuous carousel position (index of the card facing the viewer)
-  const pos = FIRST - (1 - spinIn) * 2.2 + swaps[1] + swaps[2] + swaps[3];
+  const t = frame / FPS;
+  const pos = FIRST - (1 - spinIn) * 2.2 + swaps[1] + swaps[2] + swaps[3] + Math.max(0, t - 1.9) * 0.22;
 
   return (
     <AbsoluteFill
@@ -49,6 +51,7 @@ export const S2Moods: React.FC = () => {
         opacity: 1 - exit,
       }}
     >
+      <Drift dur={3} zoom={0.06} panY={-10} origin="50% 60%">
       {/* light from above */}
       <div
         style={{
@@ -106,17 +109,15 @@ export const S2Moods: React.FC = () => {
             <div
               style={{
                 position: 'absolute',
-                top: 52,
+                top: 40,
                 left: 0,
                 right: 0,
-                fontFamily: FONT,
-                fontWeight: 800,
-                letterSpacing: '-0.05em',
-                color: C.white,
+                ...HEADLINE,
                 textAlign: 'center',
               }}
             >
-              <WordReveal words={['Music', 'for']} start={0.08} stagger={0.07} style={{justifyContent: 'center', fontSize: 96, lineHeight: 1}} />
+              <div style={{...SUBTITLE, fontSize: 24, marginBottom: 10, opacity: tween(frame, 0.1, 0.45, 0, 1)}}>Playlists that get you</div>
+              <WordReveal words={['Music', 'for']} start={0.08} stagger={0.07} style={{justifyContent: 'center', fontSize: 100, lineHeight: 1}} wordStyle={gradText()} />
               <div style={{position: 'relative', height: 150, overflow: 'hidden', marginTop: 4}}>
                 {MOODS.map((m, i) => {
                   const enter = i === 0 ? sp(frame, 0.14, {damping: 18, stiffness: 150}) : swaps[i];
@@ -130,13 +131,13 @@ export const S2Moods: React.FC = () => {
                         left: 0,
                         right: 0,
                         top: 0,
-                        fontSize: 128,
+                        fontSize: 132,
                         lineHeight: 1.1,
                         whiteSpace: 'nowrap',
                         transform: `translateY(${(1 - enter) * 150 - leave * 150}px)`,
                         filter: `blur(${(1 - Math.min(1, vis * 1.2)) * 14}px)`,
                         opacity: Math.max(0, vis),
-                        background: `linear-gradient(180deg, #fff -30%, ${m.color} 60%)`,
+                        background: `linear-gradient(180deg, #fff -20%, ${m.color} 70%)`,
                         WebkitBackgroundClip: 'text',
                         backgroundClip: 'text',
                         color: 'transparent',
@@ -211,6 +212,7 @@ export const S2Moods: React.FC = () => {
           })}
         </div>
       </div>
+      </Drift>
     </AbsoluteFill>
   );
 };

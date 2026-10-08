@@ -2,9 +2,11 @@ import React from 'react';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
 import {Cover, PALETTES} from '../components/Cover';
 import {GlassOrb} from '../components/GlassOrb';
+import {Drift} from '../components/Drift';
 import {MoreIcon, PauseIcon} from '../components/Icons';
+import {Stage} from '../components/Stage';
 import {SilkWave} from '../components/SilkWave';
-import {C, EASE, FONT, FONT_TEXT, FPS, lerp, sp, tween} from '../theme';
+import {C, EASE, FONT_TEXT, FPS, HEADLINE, lerp, SCENES, sp, SUBTITLE, tween} from '../theme';
 
 const PHONE_W = 420;
 const PHONE_H = 860;
@@ -74,59 +76,38 @@ export const S4DJ: React.FC = () => {
 
   const bigType: React.CSSProperties = {
     position: 'absolute',
-    top: 250,
-    fontFamily: FONT,
-    fontWeight: 800,
-    fontSize: 250,
+    top: 230,
+    ...HEADLINE,
+    fontSize: 270,
     lineHeight: 1,
-    letterSpacing: '-0.05em',
     whiteSpace: 'nowrap',
     WebkitBackgroundClip: 'text',
     backgroundClip: 'text',
     color: 'transparent',
-    filter: `drop-shadow(0 0 40px rgba(30,215,96,0.25))${words < 0.99 ? ` blur(${(1 - words) * 16}px)` : ''}`,
+    filter: `drop-shadow(0 0 40px rgba(30,215,96,0.2))${words < 0.99 ? ` blur(${(1 - words) * 16}px)` : ''}`,
     opacity: words,
   };
 
   return (
     <AbsoluteFill style={{overflow: 'hidden'}}>
-      {/* Stage lighting (fades away on exit so the shared background takes over) */}
-      <AbsoluteFill style={{opacity: 1 - exit}}>
-        <AbsoluteFill style={{background: '#020604'}} />
-        <AbsoluteFill
-          style={{
-            background:
-              'radial-gradient(ellipse 60% 45% at 50% 105%, rgba(30,215,96,0.55) 0%, rgba(30,215,96,0.12) 50%, transparent 80%), radial-gradient(ellipse 50% 40% at 50% -5%, rgba(15,163,177,0.22) 0%, transparent 70%), radial-gradient(circle 520px at 960px 560px, rgba(30,215,96,0.16) 0%, transparent 70%)',
-          }}
-        />
-        <AbsoluteFill
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1.2px, transparent 1.8px)',
-            backgroundSize: '44px 44px',
-            maskImage: 'radial-gradient(ellipse 70% 60% at 50% 45%, black 0%, transparent 100%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 45%, black 0%, transparent 100%)',
-          }}
-        />
-      </AbsoluteFill>
+      {/* Shared brand stage (continues seamlessly into the numbers chapter) */}
+      <Stage offset={SCENES.dj.start} />
 
-      {/* Eyebrow */}
+      <Drift dur={3.5} zoom={0.05} panY={-12}>
+      {/* Subtitle */}
       <div
         style={{
+          ...SUBTITLE,
           position: 'absolute',
-          top: 120,
+          top: 96,
           left: 0,
           right: 0,
           textAlign: 'center',
-          fontFamily: FONT_TEXT,
-          fontWeight: 700,
-          fontSize: 22,
-          letterSpacing: '0.26em',
-          color: C.green,
           opacity: tween(frame, 0.45, 0.8, 0, 1) * (1 - exit),
           transform: `translateY(${tween(frame, 0.45, 0.9, 14, 0) - exit * 60}px)`,
         }}
       >
-        MADE FOR YOU · AI-POWERED
+        Made for you · Powered by AI
       </div>
 
       {/* Giant type, split by the phone */}
@@ -134,8 +115,8 @@ export const S4DJ: React.FC = () => {
         style={{
           ...bigType,
           right: 1920 - 765,
-          backgroundImage: 'linear-gradient(90deg, #E9FFF1 0%, #8CFFB9 45%, #1ED760 100%)',
-          transform: `translateX(${(1 - words) * 260 - exit * 900}px)`,
+          backgroundImage: 'linear-gradient(180deg, #FFFFFF 25%, rgba(255,255,255,0.55) 100%)',
+          transform: `translateX(${(1 - words) * 260 - t * 10 - exit * 900}px)`,
         }}
       >
         Your
@@ -144,8 +125,8 @@ export const S4DJ: React.FC = () => {
         style={{
           ...bigType,
           left: 1128,
-          backgroundImage: 'linear-gradient(90deg, #1ED760 0%, #35D0C0 45%, #8F7BFF 100%)',
-          transform: `translateX(${-(1 - words) * 260 + exit * 900}px)`,
+          backgroundImage: 'linear-gradient(180deg, #FFFFFF 15%, #1ED760 100%)',
+          transform: `translateX(${-(1 - words) * 260 + t * 10 + exit * 900}px)`,
         }}
       >
         AI DJ
@@ -301,6 +282,8 @@ export const S4DJ: React.FC = () => {
             </div>
         </div>
       </div>
+
+      </Drift>
 
       {/* Hand-off from the green takeover */}
       {greenFade > 0 && <AbsoluteFill style={{background: C.green, opacity: greenFade}} />}

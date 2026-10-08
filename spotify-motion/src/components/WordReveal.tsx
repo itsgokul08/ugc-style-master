@@ -17,7 +17,8 @@ export const WordReveal: React.FC<{
   blur?: number;
   style?: React.CSSProperties;
   wordGap?: string;
-}> = ({words, start, stagger = 0.06, duration = 0.7, rise = 0.55, blur = 16, style, wordGap = '0.24em'}) => {
+  wordStyle?: React.CSSProperties;
+}> = ({words, start, stagger = 0.06, duration = 0.7, rise = 0.55, blur = 16, style, wordGap = '0.24em', wordStyle}) => {
   const frame = useCurrentFrame();
   return (
     <div style={{display: 'flex', flexWrap: 'wrap', columnGap: wordGap, ...style}}>
@@ -35,6 +36,7 @@ export const WordReveal: React.FC<{
               transformOrigin: 'left bottom',
               filter: `blur(${(1 - p) * blur}px)`,
               opacity: o,
+              ...wordStyle,
               ...word.style,
             }}
           >

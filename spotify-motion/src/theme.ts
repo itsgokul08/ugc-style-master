@@ -90,3 +90,27 @@ export const rand = (seed: number) => {
   const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
   return x - Math.floor(x);
 };
+
+// ---------------------------------------------------------------- typography
+// One type system for every screen: thin display headlines with a soft white→grey
+// fade, plus a small grey sentence-case subtitle.
+export const HEADLINE: import('react').CSSProperties = {
+  fontFamily: FONT,
+  fontWeight: 300,
+  letterSpacing: '-0.035em',
+};
+
+/** Vertical gradient fill for text (apply per glyph/word span). */
+export const gradText = (top = '#FFFFFF', bottom = 'rgba(255,255,255,0.55)', hold = 25): import('react').CSSProperties => ({
+  background: `linear-gradient(180deg, ${top} ${hold}%, ${bottom} 100%)`,
+  WebkitBackgroundClip: 'text',
+  backgroundClip: 'text',
+  color: 'transparent',
+});
+
+export const SUBTITLE: import('react').CSSProperties = {
+  fontFamily: FONT_TEXT,
+  fontSize: 26,
+  fontWeight: 400,
+  color: 'rgba(255,255,255,0.55)',
+};

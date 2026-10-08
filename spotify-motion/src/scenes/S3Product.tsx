@@ -120,10 +120,12 @@ export const S3Product: React.FC = () => {
   const push = tween(frame, 0.9, 2.45, 0, 0.06, EASE.inOutSoft);
   const punch = playing ? Math.sin(Math.min(1, sinceClick / 0.35) * Math.PI) * 0.018 : 0;
   const pull = tween(frame, 2.6, 3.3, 0, 1, EASE.inOutSoft);
-  const drift = tween(frame, 3.3, 4.3, 0, 0.025, EASE.inOutSoft);
+  const drift = tween(frame, 3.1, 4.3, 0, 0.06, (x) => x); // keeps moving until the dive
   const dive = tween(frame, 4.25, 5.0, 0, 1, EASE.in);
   const camScale = lerp(1 + push + punch, 0.78, pull) + drift; // around frame center
   const diveScale = 1 + dive * 26; // around the play button
+  // 3D sway once the cursor is done, settling flat again for the dive
+  const sway = tween(frame, 2.6, 3.3, 0, 1, EASE.inOutSoft) * (1 - tween(frame, 4.0, 4.3, 0, 1, EASE.inOutSoft));
 
   // Green takeover that hands off to the DJ scene
   const fill = tween(frame, 4.5, 4.98, 0, 1, EASE.in);
@@ -165,7 +167,7 @@ export const S3Product: React.FC = () => {
               background: C.black,
               overflow: 'hidden',
               opacity: enterOpacity,
-              transform: `translateY(${(1 - enter) * 520}px) rotateX(${(1 - enter) * 32}deg) rotateZ(${(1 - enter) * -5}deg) scale(${lerp(0.84, 1, enter)})`,
+              transform: `translateY(${(1 - enter) * 520}px) rotateX(${(1 - enter) * 32 + Math.sin(t * 0.9) * 1.5 * sway}deg) rotateY(${Math.sin(t * 0.7 + 0.4) * 4 * sway}deg) rotateZ(${(1 - enter) * -5}deg) scale(${lerp(0.84, 1, enter)})`,
               transformOrigin: '50% 100%',
               boxShadow: '0 80px 160px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.09), 0 0 120px rgba(30,215,96,0.08)',
               fontFamily: FONT_TEXT,
