@@ -63,10 +63,10 @@ const TRACKS: {title: string; artist: string; album: string; time: string; p: Pa
 ];
 
 const CHIPS = [
-  {x: 70, y: 255, icon: WaveIcon, title: '100M+ songs', sub: 'and counting', at: 2.78},
-  {x: 1335, y: 165, icon: NoAdsIcon, title: 'Ad-free listening', sub: 'with Premium', at: 2.9},
-  {x: 1365, y: 690, icon: OfflineIcon, title: 'Offline mode', sub: 'download anything', at: 3.02},
-  {x: 95, y: 735, icon: SparkleIcon, title: 'Lossless audio', sub: 'up to 24-bit / 44.1 kHz', at: 3.14},
+  {x: 255, y: 250, icon: WaveIcon, title: '100M+ songs', sub: 'and counting', at: 2.78},
+  {x: 1290, y: 215, icon: NoAdsIcon, title: 'Ad-free listening', sub: 'with Premium', at: 2.9},
+  {x: 1330, y: 610, icon: OfflineIcon, title: 'Offline mode', sub: 'download anything', at: 3.02},
+  {x: 265, y: 600, icon: SparkleIcon, title: 'Lossless audio', sub: 'up to 24-bit / 44.1 kHz', at: 3.14},
 ];
 
 const MiniEq: React.FC<{t: number; color?: string}> = ({t, color = C.green}) => (
@@ -120,7 +120,8 @@ export const S3Product: React.FC = () => {
   const punch = playing ? Math.sin(Math.min(1, sinceClick / 0.35) * Math.PI) * 0.018 : 0;
   const drift = tween(frame, 2.6, 4.3, 0, 0.05, EASE.inOutSoft);
   const dive = tween(frame, 4.25, 5.0, 0, 1, EASE.in);
-  const camScale = (1 + push + punch + drift) * (1 + dive * 26);
+  const camScale = 1 + push + punch + drift; // around frame center, so edge chips stay in frame
+  const diveScale = 1 + dive * 26; // around the play button
 
   // Green takeover that hands off to the DJ scene
   const fill = tween(frame, 4.5, 4.98, 0, 1, EASE.in);
@@ -132,11 +133,12 @@ export const S3Product: React.FC = () => {
     <AbsoluteFill>
       <AbsoluteFill
         style={{
-          transform: `scale(${camScale})`,
-          transformOrigin: `${PLAY_X}px ${PLAY_Y}px`,
+          transform: `scale(${diveScale})`,
+          transformOrigin: `${960 + (PLAY_X - 960) * camScale}px ${540 + (PLAY_Y - 540) * camScale}px`,
           filter: dive > 0.02 ? `blur(${dive * 10}px)` : undefined,
         }}
       >
+      <AbsoluteFill style={{transform: `scale(${camScale})`, transformOrigin: '960px 540px'}}>
         {/* Window with 3D entrance */}
         <div style={{position: 'absolute', inset: 0, perspective: 2200}}>
           <div
@@ -488,14 +490,15 @@ export const S3Product: React.FC = () => {
 
         <Cursor x={curX} y={curY} press={press} opacity={curOpacity} />
       </AbsoluteFill>
+      </AbsoluteFill>
 
       {/* Green circle takeover */}
       {fill > 0 && (
         <div
           style={{
             position: 'absolute',
-            left: PLAY_X - fill * 2400,
-            top: PLAY_Y - fill * 2400,
+            left: 960 + (PLAY_X - 960) * camScale - fill * 2400,
+            top: 540 + (PLAY_Y - 540) * camScale - fill * 2400,
             width: fill * 4800,
             height: fill * 4800,
             borderRadius: '50%',

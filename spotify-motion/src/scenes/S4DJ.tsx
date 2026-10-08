@@ -3,6 +3,7 @@ import {AbsoluteFill, useCurrentFrame} from 'remotion';
 import {Background} from '../components/Background';
 import {Cover, PALETTES} from '../components/Cover';
 import {MoreIcon, PauseIcon, SparkleIcon} from '../components/Icons';
+import {SilkWave} from '../components/SilkWave';
 import {WordReveal} from '../components/WordReveal';
 import {C, EASE, FONT, FONT_TEXT, FPS, lerp, SCENES, sp, tween} from '../theme';
 
@@ -224,14 +225,18 @@ export const S4DJ: React.FC = () => {
             </div>
 
             {/* Voice waveform */}
-            <div style={{position: 'absolute', top: 452, left: 0, right: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5, height: 50}}>
-              {Array.from({length: 26}).map((_, i) => {
-                const c = (i - 12.5) / 12.5;
-                const env = Math.exp(-c * c * 2);
-                const h = 4 + speaking * env * (8 + 34 * Math.abs(Math.sin(t * 11 + i * 0.9) * Math.cos(t * 5 - i * 0.4)));
-                return <div key={i} style={{width: 5, height: h, borderRadius: 3, background: C.green, opacity: 0.5 + env * 0.5}} />;
-              })}
-            </div>
+            <SilkWave
+              id="dj"
+              width={372}
+              height={100}
+              t={t * 1.6}
+              energy={0.3 + 0.9 * amp}
+              strands={34}
+              points={70}
+              strokeWidth={1}
+              colors={{edge: '#3D6BFF', mid: '#1ED760', core: '#E4FFEE'}}
+              style={{position: 'absolute', top: 428, left: 12}}
+            />
 
             {/* Karaoke caption */}
             <div
