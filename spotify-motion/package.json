@@ -1,0 +1,21 @@
+{
+  "name": "spotify-motion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "20s SaaS-style motion promo for Spotify, built with Remotion",
+  "scripts": {
+    "studio": "remotion studio",
+    "audio": "python3 scripts/make_audio.py",
+    "render": "remotion render SpotifyPromo out/spotify-promo.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.534",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.534"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "typescript": "5.8.3"
+  }
+}

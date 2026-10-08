@@ -1,0 +1,4 @@
+node_modules
+.remotion
+out/*
+!out/spotify-promo.mp4
