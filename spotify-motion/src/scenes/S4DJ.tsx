@@ -1,6 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
 import {Cover, PALETTES} from '../components/Cover';
+import {GlassOrb} from '../components/GlassOrb';
 import {MoreIcon, PauseIcon} from '../components/Icons';
 import {SilkWave} from '../components/SilkWave';
 import {C, EASE, FONT, FONT_TEXT, FPS, lerp, sp, tween} from '../theme';
@@ -221,55 +222,14 @@ export const S4DJ: React.FC = () => {
                 <MoreIcon size={24} color="#fff" />
               </div>
 
-              {/* Orb */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 198 - 130,
-                  top: 150,
-                  width: 260,
-                  height: 260,
-                  transform: `scale(${1 + amp * 0.12})`,
-                }}
-              >
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: -40,
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(30,215,96,0.45) 0%, transparent 65%)',
-                    opacity: 0.6 + amp * 0.4,
-                  }}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    borderRadius: `${50 + Math.sin(t * 2.1) * 8}% ${50 + Math.cos(t * 1.7) * 9}% ${50 + Math.sin(t * 2.6 + 1) * 8}% ${50 + Math.cos(t * 2.3 + 2) * 9}%`,
-                    background: `conic-gradient(from ${t * 120}deg, #1ED760, #0FA3B1, #3D6BFF, #8D2BE2, #1ED760)`,
-                    filter: 'blur(14px)',
-                  }}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 30,
-                    borderRadius: '50%',
-                    background: `conic-gradient(from ${-t * 200}deg, #B6FFCF, #1ED760, #0FA3B1, #B6FFCF)`,
-                    filter: 'blur(18px)',
-                    opacity: 0.9,
-                  }}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 85,
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 70%)',
-                    filter: 'blur(6px)',
-                  }}
-                />
-              </div>
+              {/* Glass orb */}
+              <GlassOrb
+                id="dj"
+                size={250}
+                t={t}
+                energy={amp}
+                style={{position: 'absolute', left: 198 - 125, top: 150, transform: `scale(${1 + amp * 0.06})`}}
+              />
 
               {/* Voice waveform */}
               <SilkWave

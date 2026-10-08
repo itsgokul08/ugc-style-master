@@ -12,6 +12,6 @@ const composition = await selectComposition({serveUrl, id: 'SpotifyPromo', brows
 for (const sec of process.argv.slice(2).map(Number)) {
   const frame = Math.min(composition.durationInFrames - 1, Math.round(sec * composition.fps));
   const output = path.join(outDir, `t${sec.toFixed(2)}.png`);
-  await renderStill({serveUrl, composition, frame, output, browserExecutable, scale: 0.5});
+  await renderStill({serveUrl, composition, frame, output, browserExecutable, scale: Number(process.env.SCALE || 0.5)});
   console.log(output);
 }
