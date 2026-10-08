@@ -379,10 +379,13 @@ def build():
         place(sfx, whoosh(0.18, 2000, 6000, 0.18), at - 0.16)
     # product: click and chip pops
     place(sfx, ui_click(), 8.5, 1.2)
-    for i, at in enumerate([8.78, 8.9, 9.02, 9.14]):
+    place(sfx, whoosh(0.5, 3500, 400, 0.3), 8.6)  # camera pulls back
+    for i, at in enumerate([8.85, 8.97, 9.09, 9.21]):
         place(sfx, pop(1000 + i * 120, 1800 + i * 160, 0.09, 0.22), at)
     # DJ: sparkle entrance
     place(sfx, chime([note('E6'), note('G6'), note('B6'), note('D7')], 1.4, 0.22), 11.08)
+    for i, at in enumerate([11.7, 11.86, 12.02]):  # DJ callouts
+        place(sfx, pop(800 + i * 150, 1500 + i * 200, 0.1, 0.2), at)
     # stats: counter ticks that slow down
     tt_ = 14.88
     gap = 0.03

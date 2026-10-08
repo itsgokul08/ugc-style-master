@@ -62,11 +62,12 @@ const TRACKS: {title: string; artist: string; album: string; time: string; p: Pa
   {title: 'Neon Skyline', artist: 'Polar Youth', album: 'City Static', time: '3:12', p: PALETTES.blue, v: 1},
 ];
 
+// Screen-space positions (the window is pulled back to ~0.79 scale while these are up).
 const CHIPS = [
-  {x: 255, y: 250, icon: WaveIcon, title: '100M+ songs', sub: 'and counting', at: 2.78},
-  {x: 1290, y: 215, icon: NoAdsIcon, title: 'Ad-free listening', sub: 'with Premium', at: 2.9},
-  {x: 1330, y: 610, icon: OfflineIcon, title: 'Offline mode', sub: 'download anything', at: 3.02},
-  {x: 265, y: 600, icon: SparkleIcon, title: 'Lossless audio', sub: 'up to 24-bit / 44.1 kHz', at: 3.14},
+  {x: 205, y: 285, icon: WaveIcon, title: '100M+ songs', at: 2.85},
+  {x: 1375, y: 230, icon: NoAdsIcon, title: 'Ad-free listening', at: 2.97},
+  {x: 1425, y: 565, icon: OfflineIcon, title: 'Offline mode', at: 3.09},
+  {x: 175, y: 620, icon: SparkleIcon, title: 'Lossless audio', at: 3.21},
 ];
 
 const MiniEq: React.FC<{t: number; color?: string}> = ({t, color = C.green}) => (
@@ -118,9 +119,10 @@ export const S3Product: React.FC = () => {
   // Camera: gentle push, click punch, then a dive into the play button.
   const push = tween(frame, 0.9, 2.45, 0, 0.06, EASE.inOutSoft);
   const punch = playing ? Math.sin(Math.min(1, sinceClick / 0.35) * Math.PI) * 0.018 : 0;
-  const drift = tween(frame, 2.6, 4.3, 0, 0.05, EASE.inOutSoft);
+  const pull = tween(frame, 2.6, 3.3, 0, 1, EASE.inOutSoft);
+  const drift = tween(frame, 3.3, 4.3, 0, 0.025, EASE.inOutSoft);
   const dive = tween(frame, 4.25, 5.0, 0, 1, EASE.in);
-  const camScale = 1 + push + punch + drift; // around frame center, so edge chips stay in frame
+  const camScale = lerp(1 + push + punch, 0.78, pull) + drift; // around frame center
   const diveScale = 1 + dive * 26; // around the play button
 
   // Green takeover that hands off to the DJ scene
@@ -131,6 +133,17 @@ export const S3Product: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      <div
+        style={{
+          position: 'absolute',
+          left: 960 - 1000,
+          top: 700,
+          width: 2000,
+          height: 760,
+          background: 'radial-gradient(ellipse 50% 50% at 50% 50%, rgba(30,215,96,0.55) 0%, rgba(30,215,96,0.16) 45%, transparent 75%)',
+          opacity: pull * (1 - dive),
+        }}
+      />
       <AbsoluteFill
         style={{
           transform: `scale(${diveScale})`,
@@ -440,57 +453,90 @@ export const S3Product: React.FC = () => {
           </div>
         </div>
 
-        {/* Feature chips, floating in front of the window */}
-        {CHIPS.map((ch, i) => {
-          const p = sp(frame, ch.at, {damping: 13, stiffness: 160});
-          const out = tween(frame, 4.0 + i * 0.03, 4.3 + i * 0.03, 0, 1, EASE.in);
-          const bob = Math.sin(t * 2 + i * 1.4) * 7;
-          const Icon = ch.icon;
-          const fromLeft = ch.x < 960;
-          return (
-            <div
-              key={ch.title}
-              style={{
-                position: 'absolute',
-                left: ch.x,
-                top: ch.y,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 18,
-                padding: '18px 28px 18px 18px',
-                borderRadius: 22,
-                background: 'linear-gradient(180deg, rgba(40,40,40,0.96), rgba(22,22,22,0.96))',
-                border: '1px solid rgba(255,255,255,0.12)',
-                boxShadow: '0 30px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08)',
-                fontFamily: FONT_TEXT,
-                opacity: Math.min(1, p * 1.5) * (1 - out),
-                transform: `translate(${(1 - p) * (fromLeft ? -80 : 80)}px, ${bob + (1 - p) * 40}px) scale(${lerp(0.6, 1, p) * (1 - out * 0.3)})`,
-              }}
-            >
-              <div
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: 16,
-                  background: 'rgba(30,215,96,0.14)',
-                  border: '1px solid rgba(30,215,96,0.35)',
-                  display: 'grid',
-                  placeItems: 'center',
-                }}
-              >
-                <Icon size={30} color={C.green} />
-              </div>
-              <div>
-                <div style={{fontSize: 27, fontWeight: 700, color: C.white, letterSpacing: '-0.01em'}}>{ch.title}</div>
-                <div style={{fontSize: 18, color: C.sub, marginTop: 3}}>{ch.sub}</div>
-              </div>
-            </div>
-          );
-        })}
-
         <Cursor x={curX} y={curY} press={press} opacity={curOpacity} />
       </AbsoluteFill>
       </AbsoluteFill>
+
+
+      {/* Feature chips: icon tile + glowing label, straddling the window edges */}
+      {CHIPS.map((ch, i) => {
+        const tile = sp(frame, ch.at, {damping: 11, stiffness: 190});
+        const pill = sp(frame, ch.at + 0.08, {damping: 16, stiffness: 150});
+        const out = tween(frame, 4.0 + i * 0.03, 4.28 + i * 0.03, 0, 1, EASE.in);
+        const bob = Math.sin(t * 2 + i * 1.4) * 6;
+        const ping = ((t - ch.at) % 1.2) / 1.2;
+        const Icon = ch.icon;
+        return (
+          <div
+            key={ch.title}
+            style={{
+              position: 'absolute',
+              left: ch.x,
+              top: ch.y,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              fontFamily: FONT_TEXT,
+              opacity: 1 - out,
+              transform: `translateY(${bob}px) scale(${1 - out * 0.25})`,
+            }}
+          >
+            <div
+              style={{
+                position: 'relative',
+                width: 66,
+                height: 66,
+                borderRadius: 18,
+                background: 'linear-gradient(145deg, #4BEA88 0%, #1ED760 45%, #129A43 100%)',
+                boxShadow: '0 0 34px rgba(30,215,96,0.5), 0 14px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.45)',
+                display: 'grid',
+                placeItems: 'center',
+                transform: `scale(${tile}) rotate(${(1 - tile) * -25}deg)`,
+                zIndex: 2,
+              }}
+            >
+              <Icon size={32} color="#000" />
+              {/* live ping */}
+              <div style={{position: 'absolute', right: -6, top: -6, width: 20, height: 20}}>
+                {t > ch.at + 0.3 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: -ping * 12,
+                      borderRadius: '50%',
+                      border: '2px solid #fff',
+                      opacity: (1 - ping) * 0.7,
+                    }}
+                  />
+                )}
+                <div style={{position: 'absolute', inset: 0, borderRadius: '50%', background: '#fff', border: '3px solid #0B3D1F'}} />
+              </div>
+            </div>
+            <div
+              style={{
+                height: 62,
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0 28px',
+                borderRadius: 16,
+                background: 'linear-gradient(180deg, rgba(22,48,32,0.9), rgba(8,20,13,0.9))',
+                border: '1.5px solid rgba(30,215,96,0.6)',
+                boxShadow: '0 0 26px rgba(30,215,96,0.28), inset 0 0 20px rgba(30,215,96,0.14), 0 20px 40px rgba(0,0,0,0.45)',
+                fontSize: 27,
+                fontWeight: 600,
+                letterSpacing: '-0.01em',
+                color: C.white,
+                whiteSpace: 'nowrap',
+                opacity: Math.min(1, pill * 1.4),
+                transform: `translateX(${(1 - pill) * -40}px)`,
+                clipPath: `inset(-40px ${(1 - pill) * 100}% -40px -40px)`,
+              }}
+            >
+              {ch.title}
+            </div>
+          </div>
+        );
+      })}
 
       {/* Green circle takeover */}
       {fill > 0 && (
