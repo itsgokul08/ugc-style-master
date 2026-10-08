@@ -24,7 +24,7 @@ import {
   WaveIcon,
 } from '../components/Icons';
 import {SpotifyLogo} from '../components/SpotifyLogo';
-import {C, EASE, FONT, FONT_TEXT, FPS, lerp, sp, tween} from '../theme';
+import {C, EASE, FONT_TEXT, FPS, gradText, HEADLINE, lerp, sp, tween} from '../theme';
 
 // Window geometry (screen space)
 const WX = 210;
@@ -281,11 +281,10 @@ export const S3Product: React.FC = () => {
                   <div style={{fontSize: 16, fontWeight: 600, ...reveal(0.55)}}>Playlist</div>
                   <div
                     style={{
-                      fontFamily: FONT,
-                      fontSize: 96,
-                      fontWeight: 900,
-                      letterSpacing: '-0.045em',
-                      lineHeight: 1,
+                      ...HEADLINE,
+                      ...gradText(),
+                      fontSize: 104,
+                      lineHeight: 1.05,
                       margin: '10px 0 18px',
                       ...reveal(0.6, 40),
                     }}

@@ -21,7 +21,7 @@ export const S1Hook: React.FC = () => {
   const kick = t > 0.9 ? beatPulse(t, 6) : 0;
 
   const accent: React.CSSProperties = {
-    background: `linear-gradient(92deg, #1ED760 0%, #B6FFCF ${40 + Math.sin(t * 2) * 15}%, #1ED760 100%)`,
+    backgroundImage: `linear-gradient(92deg, #1ED760 0%, #B6FFCF ${40 + Math.sin(t * 2) * 15}%, #1ED760 100%)`,
     WebkitBackgroundClip: 'text',
     backgroundClip: 'text',
     color: 'transparent',

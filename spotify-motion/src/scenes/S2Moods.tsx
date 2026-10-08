@@ -137,7 +137,7 @@ export const S2Moods: React.FC = () => {
                         transform: `translateY(${(1 - enter) * 150 - leave * 150}px)`,
                         filter: `blur(${(1 - Math.min(1, vis * 1.2)) * 14}px)`,
                         opacity: Math.max(0, vis),
-                        background: `linear-gradient(180deg, #fff -20%, ${m.color} 70%)`,
+                        backgroundImage: `linear-gradient(180deg, #fff -20%, ${m.color} 70%)`,
                         WebkitBackgroundClip: 'text',
                         backgroundClip: 'text',
                         color: 'transparent',

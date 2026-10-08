@@ -102,7 +102,9 @@ export const HEADLINE: import('react').CSSProperties = {
 
 /** Vertical gradient fill for text (apply per glyph/word span). */
 export const gradText = (top = '#FFFFFF', bottom = 'rgba(255,255,255,0.55)', hold = 25): import('react').CSSProperties => ({
-  background: `linear-gradient(180deg, ${top} ${hold}%, ${bottom} 100%)`,
+  // backgroundImage (not the `background` shorthand): the shorthand resets background-clip,
+  // which turns animated gradient text into a solid box during sequential renders.
+  backgroundImage: `linear-gradient(180deg, ${top} ${hold}%, ${bottom} 100%)`,
   WebkitBackgroundClip: 'text',
   backgroundClip: 'text',
   color: 'transparent',

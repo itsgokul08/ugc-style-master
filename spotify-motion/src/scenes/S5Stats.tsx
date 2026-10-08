@@ -56,24 +56,24 @@ const GY = 1250;
 const R = 830;
 
 const STATS = [
-  {x: 250, y: 690, value: 600, suffix: 'M+', label: 'monthly listeners', icon: 'head', at: 0.55},
-  {x: 770, y: 575, value: 100, suffix: 'M+', label: 'songs to explore', icon: 'wave', at: 0.7},
-  {x: 1330, y: 655, value: 180, suffix: '+', label: 'markets worldwide', icon: 'globe', at: 0.85},
+  {x: 150, y: 600, value: 600, suffix: 'M+', label: 'monthly listeners', icon: 'head', at: 0.55},
+  {x: 745, y: 500, value: 100, suffix: 'M+', label: 'songs to explore', icon: 'wave', at: 0.7},
+  {x: 1335, y: 590, value: 180, suffix: '+', label: 'markets worldwide', icon: 'globe', at: 0.85},
 ];
 
 const TITLE = 'The world listens.';
 
 const StatIcon: React.FC<{kind: string}> = ({kind}) => {
-  if (kind === 'wave') return <WaveIcon size={24} color="#E8FFE9" />;
+  if (kind === 'wave') return <WaveIcon size={36} color="#E8FFE9" />;
   if (kind === 'globe')
     return (
-      <svg width={24} height={24} viewBox="0 0 24 24">
+      <svg width={36} height={36} viewBox="0 0 24 24">
         <circle cx={12} cy={12} r={9} fill="none" stroke="#E8FFE9" strokeWidth={1.8} />
         <path d="M3 12h18M12 3c2.6 2.6 2.6 15.4 0 18M12 3c-2.6 2.6-2.6 15.4 0 18" fill="none" stroke="#E8FFE9" strokeWidth={1.6} />
       </svg>
     );
   return (
-    <svg width={24} height={24} viewBox="0 0 24 24">
+    <svg width={36} height={36} viewBox="0 0 24 24">
       <path d="M4 14v-2a8 8 0 0 1 16 0v2" fill="none" stroke="#E8FFE9" strokeWidth={1.8} />
       <rect x={3} y={13} width={5} height={7} rx={2} fill="#E8FFE9" />
       <rect x={16} y={13} width={5} height={7} rx={2} fill="#E8FFE9" />
@@ -283,9 +283,9 @@ export const S5Stats: React.FC = () => {
                 top: st.y,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 18,
-                padding: '18px 30px 18px 18px',
-                borderRadius: 20,
+                gap: 24,
+                padding: '26px 44px 26px 26px',
+                borderRadius: 28,
                 background: 'linear-gradient(180deg, rgba(34,48,40,0.55), rgba(8,16,11,0.6))',
                 backdropFilter: 'blur(14px)',
                 WebkitBackdropFilter: 'blur(14px)',
@@ -300,9 +300,9 @@ export const S5Stats: React.FC = () => {
             >
               <div
                 style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 25,
+                  width: 76,
+                  height: 76,
+                  borderRadius: 38,
                   background: 'rgba(255,255,255,0.08)',
                   border: '1px solid rgba(255,255,255,0.18)',
                   display: 'grid',
@@ -312,11 +312,11 @@ export const S5Stats: React.FC = () => {
                 <StatIcon kind={st.icon} />
               </div>
               <div>
-                <div style={{fontFamily: FONT, fontSize: 50, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums'}}>
-                  {Math.round(st.value * count)}
+                <div style={{...HEADLINE, fontWeight: 400, fontSize: 92, lineHeight: 1, fontVariantNumeric: 'tabular-nums'}}>
+                  <span style={gradText()}>{Math.round(st.value * count)}</span>
                   <span style={{color: C.green}}>{st.suffix}</span>
                 </div>
-                <div style={{fontSize: 19, color: 'rgba(255,255,255,0.68)', marginTop: 6}}>{st.label}</div>
+                <div style={{fontSize: 27, color: 'rgba(255,255,255,0.68)', marginTop: 8}}>{st.label}</div>
               </div>
             </div>
           );
